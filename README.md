@@ -1,0 +1,2 @@
+# Firework.ossl
+Opensim Firework
