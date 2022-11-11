@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.6
-    @updated: "2022-11-10 20:26:53"
-    @revision: 251
+    @updated: "2022-11-11 00:41:45"
+    @revision: 261
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -20,7 +20,7 @@ float power = 3;
 //* variables
 key target = NULL_KEY;
 
-drop(key id)
+shoot(key id)
 {
     target = id;
     integer i = count;
@@ -36,22 +36,17 @@ default
 {
     state_entry()
     {
-        llVolumeDetect(TRUE);
+//        llVolumeDetect(TRUE);
     }
 
-    touch(integer num_detected)
+    touch_start(integer num_detected)
     {
-        drop(llDetectedKey(0));
+        shoot(llDetectedKey(0));
     }
 
     object_rez(key id)
     {
         //osMessageObject(id, "fire");
-    }
-
-    collision_start( integer num_detected )
-    {
-        drop(llDetectedKey(0));
     }
 
     timer()

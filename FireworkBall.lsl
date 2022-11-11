@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-10 20:12:24"
-    @revision: 276
+    @updated: "2022-11-11 00:23:59"
+    @revision: 278
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -126,7 +126,7 @@ fireworkOn()
 shoot()
 {
     stateBall = 0;
-    tail();
+    //tail(); //* no, save sime for explode
     playsoundWhistle();
 }
 
@@ -140,7 +140,7 @@ default
 
     on_rez(integer number)
     {
-    	llParticleSystem([]);
+        llParticleSystem([]);
         if (number > 0) {
             llSetObjectDesc((string)number);
             llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
