@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-10 01:46:19"
-    @revision: 203
+    @updated: "2022-11-10 02:31:52"
+    @revision: 224
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -15,6 +15,19 @@
 */
 
 float particleLife = 2.0;
+integer colorIndex = 0;
+
+list StartColors = [
+	<0.8,0.2,0.1>,
+	<0.8,0.5,0.1>,
+    <0.2,0.5,0.1>
+	];
+
+list EndColors = [
+	<0.9,0.2,0.3>,
+	<0.9,0.9,0.3>,
+    <0.3,0.6,0.3>
+	];
 
 playsound()
 {
@@ -23,6 +36,9 @@ playsound()
 
 fireworkTo(key target)
 {
+	integer index = colorIndex % llGetListLength(StartColors);
+	vector start_color = llList2Vector(StartColors, index);
+    vector end_color = llList2Vector(EndColors, index);
 
     playsound();
     integer flags = 0;
@@ -52,8 +68,8 @@ fireworkTo(key target)
                     PSYS_PART_END_GLOW, 0.01,
                     PSYS_PART_START_ALPHA, 0.9,
                     PSYS_PART_END_ALPHA, 0.01,
-                    PSYS_PART_START_COLOR, <0.8,0.5,0.1>,
-                    PSYS_PART_END_COLOR, <0.9,0.9,0.3>,
+                    PSYS_PART_START_COLOR, start_color,
+                    PSYS_PART_END_COLOR, end_color,
                     PSYS_PART_START_SCALE, <0.3,0.3,0.0>,
                     PSYS_PART_END_SCALE, <0.5,0.5,0.0>
     ];
@@ -66,6 +82,7 @@ integer isOn = FALSE;
 
 fireworkOn()
 {
+    llSetStatus(STATUS_PHYSICS, FALSE);
     fireworkTo("");
     isOn = TRUE;
 }
@@ -87,13 +104,13 @@ default
     {
         //llResetScript();
         if (number > 0) {
-            llSetStatus(STATUS_PHYSICS, TRUE);
             llSetObjectDesc((string)number);
         }
     }
 
     touch_start(integer num_detected)
     {
+    	colorIndex = 3;
         if (llDetectedKey(0) == llGetOwner())
             fireworkOn();
     }
@@ -108,13 +125,13 @@ default
         else
         {
             fireworkOn();
-            llSetTimerEvent(2);
+            llSetTimerEvent(1);
         }
     }
 
     dataserver( key queryid, string data ){
         if (data == "fire")
-            llSetTimerEvent(1);
+            llSetTimerEvent(2);
     }
 
 }
