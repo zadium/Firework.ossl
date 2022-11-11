@@ -3,87 +3,98 @@
     @description:
 
     @author:
-    @version: 1.6
-    @updated: "2022-11-11 04:10:54"
-    @revision: 263
+    @version: 1.7
+    @updated: "2022-11-11 16:21:17"
+    @revision: 287
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
     @ref:
 
     @notice:
-    
-    # Firework.ossl
 
-    Opensim Firework
+        # Firework.ossl
 
-    ### Instruction ###
+        Opensim Firework
 
-    Add 2 prims one for ball/bullet one for shooter
+        ### Instruction ###
 
-    #### Fireball
+        Add 2 prims one for ball/bullet one for shooter
 
-    Name Ball/Bullet as `FireworkBall`, make it physic, change `Gravity` to 0.1, make it Glow as you like
+        #### Fireball
 
-    Upload FireworkBall.lsl, Whistle.wav, Explode.wav to FireworkBall prim
+        Name Ball/Bullet as `FireworkBall`, make it physic, change `Gravity` to 0.1, make it Glow as you like
 
-    Take copy of Fireball
+        Upload FireworkBall.lsl, Whistle.wav, Explode.wav to FireworkBall prim
 
-    #### Shooter
+        Take copy of Fireball
 
-    Upload FireworkShooter.lsl to `Shooter`
-    Copy `Fireworkball` into `Shooter`
+        #### Shooter
 
-    Have fun
+        Upload FireworkShooter.lsl to `Shooter`
+        Copy `Fireworkball` into `Shooter`
 
-    ### Config ###
+        Have fun
 
-    ### Sounds  ###
+        ### Config ###
 
-    Thanks to freesound
+        ### Sounds  ###
 
-	    https://freesound.org/people/soundscalpel.com/sounds/110391/
+        Thanks to freesound
 
-    	https://freesound.org/people/Rudmer_Rotteveel/sounds/336008/
+	        https://freesound.org/people/soundscalpel.com/sounds/110391/
+
+    	    https://freesound.org/people/Rudmer_Rotteveel/sounds/336008/
 */
 //* setting
 integer count = 3;
 float power = 3;
+float time = 1;
 
 //* variables
-key target = NULL_KEY;
+integer current = 0;
 
-shoot(key id)
+shoot()
 {
-    target = id;
-    integer i = count;
-    while (i--)
-    {
-        float randPower = 1;
-        llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, power + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0, PI, 0.0>), i+1);
-        llSleep(0.5);
-    }
+    float randPower = 1;
+    llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, power + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0, PI, 0.0>), current);
+}
+
+start()
+{
+	current = current + count;
+	llSetTimerEvent(0.2+llFrand(0.2));
 }
 
 default
 {
     state_entry()
     {
-//        llVolumeDetect(TRUE);
+    }
+
+    on_rez(integer number)
+    {
+        llResetScript();
     }
 
     touch_start(integer num_detected)
     {
-        shoot(llDetectedKey(0));
+        start();
     }
 
     object_rez(key id)
     {
-        //osMessageObject(id, "fire");
+    	vector color = <1,1,1>;
+        osMessageObject(id, "fire;"+(string)time+";"+(string)color);
     }
 
     timer()
     {
+	   	shoot();
+        llSetTimerEvent(0.2+llFrand(0.2));
+    	current--;
+        if (current <= 0)
+        	llSetTimerEvent(0);
     }
 
 }
