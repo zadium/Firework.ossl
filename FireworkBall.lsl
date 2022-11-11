@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-10 16:18:43"
-    @revision: 246
+    @updated: "2022-11-10 20:12:24"
+    @revision: 276
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -45,30 +45,30 @@ tail()
             PSYS_PART_INTERP_COLOR_MASK
             | PSYS_PART_INTERP_SCALE_MASK
             | PSYS_PART_EMISSIVE_MASK
-            | PSYS_PART_FOLLOW_VELOCITY_MASK
-            | PSYS_PART_BOUNCE_MASK
+//            | PSYS_PART_FOLLOW_VELOCITY_MASK
+//            | PSYS_PART_BOUNCE_MASK
 //            | PSYS_PART_FOLLOW_SRC_MASK
         ,
-        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_EXPLODE,
-        PSYS_SRC_BURST_RADIUS,      0.05,
+        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
+        PSYS_SRC_BURST_RADIUS,      0.01,
         PSYS_SRC_BURST_RATE,        0.1,
-        PSYS_SRC_ANGLE_BEGIN,       -2 * PI,
-        PSYS_SRC_ANGLE_END,         2 * PI,
-        PSYS_SRC_BURST_PART_COUNT,  10,
-        PSYS_SRC_BURST_SPEED_MIN,   0.0,
-        PSYS_SRC_BURST_SPEED_MAX,   0.0,
-        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.05>,
+        PSYS_SRC_ANGLE_BEGIN,       -PI/4,
+        PSYS_SRC_ANGLE_END,         PI/4,
+        PSYS_SRC_BURST_PART_COUNT,  25,
+        PSYS_SRC_BURST_SPEED_MIN,   0.01,
+        PSYS_SRC_BURST_SPEED_MAX,   0.05,
+        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
         PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>,
 
         PSYS_PART_START_COLOR,      <0.9, 0.9, 0.9 >,
-        PSYS_PART_END_COLOR,        <1, 1, 1 >,
+        PSYS_PART_END_COLOR,        <1, 1, 1>,
         PSYS_PART_START_GLOW,       0.0,
         PSYS_PART_END_GLOW,         0.01,
         PSYS_PART_START_ALPHA,      0.5,
         PSYS_PART_END_ALPHA,        0.9,
         PSYS_PART_START_SCALE,      <0.03, 0.03, 0.03>,
         PSYS_PART_END_SCALE,        <0.07, 0.07, 0.07>,
-        PSYS_PART_MAX_AGE,          1
+        PSYS_PART_MAX_AGE,          2
         ]);
 }
 
@@ -113,37 +113,39 @@ fireworkTo(key target)
     ];
 
     llParticleSystem(params);
-    llSetTimerEvent(particleLife + 1);
 }
 
-integer isOn = FALSE;
+integer stateBall = 0;
 
 fireworkOn()
 {
     llSetStatus(STATUS_PHYSICS, FALSE);
     fireworkTo("");
-    isOn = TRUE;
 }
 
-fireworkOff()
+shoot()
 {
-    llParticleSystem([]);
-    isOn = FALSE;
+    stateBall = 0;
+    tail();
+    playsoundWhistle();
 }
 
 default
 {
     state_entry()
     {
-        fireworkOff();
+        llParticleSystem([]);
+        stateBall = 0;
     }
 
     on_rez(integer number)
     {
-        //llResetScript();
+    	llParticleSystem([]);
         if (number > 0) {
-	        tail();
             llSetObjectDesc((string)number);
+            llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
+            shoot();
+            llSetTimerEvent(2);
         }
     }
 
@@ -151,8 +153,7 @@ default
     {
         if (llDetectedKey(0) == llGetOwner())
         {
-            tail();
-        	playsoundWhistle();
+            shoot();
             llSleep(2);
             fireworkOn();
         }
@@ -160,23 +161,21 @@ default
 
     timer()
     {
-        if (isOn)
+        if (stateBall == 0)
         {
-            if ((integer)llGetObjectDesc()>0)
-                llDie();
+            stateBall = 1;
+            llSetTimerEvent(2);
         }
-        else
+        else if (stateBall == 1)
         {
+            stateBall = 2;
             fireworkOn();
             llSetTimerEvent(1);
         }
-    }
-
-    dataserver( key queryid, string data ){
-        if (data == "fire")
+        else
         {
-        	playsoundWhistle();
-            llSetTimerEvent(2);
+            if ((integer)llGetObjectDesc()>0)
+                llDie();
         }
     }
 

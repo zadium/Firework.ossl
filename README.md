@@ -1,5 +1,28 @@
 # Firework.ossl
+
 Opensim Firework
+
+### Instruction
+
+Add 2 prims one for ball/bullet one for shooter
+
+#### Fireball
+
+Name Ball/Bullet as `FireworkBall`, make it physic, change `Gravity` to 0.1, make it Glow as you like
+
+Upload FireworkBall.lsl, Whistle.wav, Explode.wav to FireworkBall prim
+
+Take copy of Fireball
+
+#### Shooter
+
+Upload FireworkShooter.lsl to `Shooter`
+Copy `Fireworkball` into `Shooter`
+
+Have fun
+
+
+### Config
 
 ### Sounds
 

@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-10 16:33:49"
-    @revision: 237
+    @updated: "2022-11-10 20:17:22"
+    @revision: 246
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -15,6 +15,7 @@
 */
 //* setting
 integer count = 3;
+float power = 3;
 
 //* variables
 key target = NULL_KEY;
@@ -25,9 +26,9 @@ drop(key id)
     integer i = count;
     while (i--)
     {
-    	float randPower = 0.05;
-        llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, 2 + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0,PI,0.0>), i+1);
-        llSleep(0.1);
+        float randPower = 0.05;
+        llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, power + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0, PI, 0.0>), i+1);
+        llSleep(0.5);
     }
 }
 
@@ -45,7 +46,7 @@ default
 
     object_rez(key id)
     {
-        osMessageObject(id, "fire");
+        //osMessageObject(id, "fire");
     }
 
     collision_start( integer num_detected )
