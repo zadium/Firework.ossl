@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-11 00:23:59"
-    @revision: 278
+    @updated: "2022-11-11 04:10:54"
+    @revision: 279
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
