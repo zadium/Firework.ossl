@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.1
-    @updated: "2022-11-10 02:26:55"
-    @revision: 226
+    @updated: "2022-11-10 16:33:49"
+    @revision: 237
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -14,7 +14,7 @@
     @notice:
 */
 //* setting
-integer count = 1;
+integer count = 3;
 
 //* variables
 key target = NULL_KEY;
@@ -24,7 +24,11 @@ drop(key id)
     target = id;
     integer i = count;
     while (i--)
-        llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <0, 0, 3>,  llGetRot() * llEuler2Rot(<0.0,PI,0.0>), i+1);
+    {
+    	float randPower = 0.05;
+        llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, 2 + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0,PI,0.0>), i+1);
+        llSleep(0.1);
+    }
 }
 
 default
