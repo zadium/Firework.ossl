@@ -3,9 +3,9 @@
     @description:
 
     @author:
-    @version: 1.7
-    @updated: "2022-11-11 16:09:43"
-    @revision: 293
+    @version: 1.8
+    @updated: "2022-11-14 21:09:25"
+    @revision: 295
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -50,7 +50,7 @@ explode()
 //    flags = flags | PSYS_PART_BOUNCE_MASK;
     flags = flags | PSYS_PART_FOLLOW_VELOCITY_MASK;
     list params = [
-    				PSYS_SRC_MAX_AGE, 1,
+                    PSYS_SRC_MAX_AGE, 1,
                     PSYS_SRC_BURST_RADIUS, 0.1,
                     PSYS_SRC_PATTERN, PSYS_SRC_PATTERN_EXPLODE,
                     PSYS_SRC_BURST_RATE, 0.1,
@@ -81,8 +81,8 @@ integer stateBall = 0;
 
 fireworkOn()
 {
-	if ((integer)llGetObjectDesc()>0)
-    	llSetStatus(STATUS_PHYSICS, FALSE);
+    if ((integer)llGetObjectDesc()>0)
+        llSetStatus(STATUS_PHYSICS, FALSE);
     explode();
 }
 
