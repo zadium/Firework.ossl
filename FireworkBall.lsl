@@ -3,9 +3,9 @@
     @description:
 
     @author:
-    @version: 1.8
-    @updated: "2022-11-15 14:51:17"
-    @revision: 307
+    @version: 1.10
+    @updated: "2022-11-15 23:47:35"
+    @revision: 357
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -45,6 +45,7 @@ explode()
     llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, start_color, 1.0, 20, 0, PRIM_GLOW, ALL_SIDES, 1]);
 
     playsoundExplode();
+
     integer flags = 0;
     flags = flags | PSYS_PART_EMISSIVE_MASK | PSYS_PART_INTERP_COLOR_MASK;
 //    flags = flags | PSYS_PART_FOLLOW_SRC_MASK;
@@ -66,13 +67,13 @@ explode()
 
                     PSYS_PART_MAX_AGE, 3,
                     PSYS_PART_FLAGS, flags,
-                    PSYS_PART_START_GLOW, 0.05,
-                    PSYS_PART_END_GLOW, 0.01,
+                    PSYS_PART_START_GLOW, 0.03,
+                    PSYS_PART_END_GLOW, 0.05,
                     PSYS_PART_START_ALPHA, 0.9,
                     PSYS_PART_END_ALPHA, 0.01,
                     PSYS_PART_START_COLOR, start_color,
                     PSYS_PART_END_COLOR, end_color,
-                    PSYS_PART_START_SCALE, <0.3,0.3,0.0>,
+                    PSYS_PART_START_SCALE, <0.2,0.2,0.0>,
                     PSYS_PART_END_SCALE, <0.5,0.5,0.0>
     ];
 
@@ -81,31 +82,42 @@ explode()
 
 integer stateBall = 0;
 
-fireworkOn()
+firework()
 {
     if ((integer)llGetObjectDesc()>0)
         llSetStatus(STATUS_PHYSICS, FALSE);
     explode();
+    llSetTimerEvent(2);
 }
 
-shoot()
+shoot(float time)
 {
     //tail(); //* no, save some for explode
     playsoundWhistle();
     stateBall = 0;
-    llSetTimerEvent(2);
+    if (time==0)
+    {
+        float speed = llVecMag(llGetVel()); //* meter per seconds
+        llOwnerSay((string)(speed));
+        time = (speed/9.8); //* extra time to fall
+    }
+
+    llSetTimerEvent(time);
 }
 
 init()
 {
-	llParticleSystem([]);
-	llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, <1,1,1>, 0, 0, 0, PRIM_GLOW, ALL_SIDES, 0.5]);
+    llSetTimerEvent(0);
+    llParticleSystem([]);
+    llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, <1,1,1>, 0, 0, 0, PRIM_GLOW, ALL_SIDES, 0.5]);
 }
 
 default
 {
     state_entry()
     {
+    	//llOwnerSay(llGetPos());
+    	//llSetPos(llList2Vector(llGetObjectDetails(llGetOwner(), [OBJECT_POS]), 0));
         init();
         stateBall = 0;
     }
@@ -116,7 +128,7 @@ default
         if (number > 0) {
             llSetObjectDesc((string)number);
             llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
-            shoot();
+            shoot(2); //* time will use speed
         }
     }
 
@@ -124,7 +136,7 @@ default
     {
         if (llDetectedKey(0) == llGetOwner())
         {
-            shoot();
+            shoot(2);
         }
     }
 
@@ -138,7 +150,7 @@ default
         else if (stateBall == 1)
         {
             stateBall = 2;
-            fireworkOn();
+            firework();
             llSetTimerEvent(1);
         }
         else
@@ -146,8 +158,7 @@ default
             if ((integer)llGetObjectDesc()>0) //* not testing
                 llDie();
             else
-            	init();
+                init();
         }
     }
-
 }
