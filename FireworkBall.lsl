@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.8
-    @updated: "2022-11-14 21:09:25"
-    @revision: 295
+    @updated: "2022-11-15 14:51:17"
+    @revision: 307
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -15,7 +15,7 @@
 */
 
 list StartColors = [
-    <0.8,0.2,0.1>,
+    <0.8,0.1,0.1>,
     <0.8,0.5,0.1>,
     <0.2,0.5,0.1>
     ];
@@ -41,6 +41,8 @@ explode()
     integer index = ((integer)llGetObjectDesc()) % llGetListLength(StartColors);
     vector start_color = llList2Vector(StartColors, index);
     vector end_color = llList2Vector(EndColors, index);
+
+    llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, start_color, 1.0, 20, 0, PRIM_GLOW, ALL_SIDES, 1]);
 
     playsoundExplode();
     integer flags = 0;
@@ -94,11 +96,17 @@ shoot()
     llSetTimerEvent(2);
 }
 
+init()
+{
+	llParticleSystem([]);
+	llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, <1,1,1>, 0, 0, 0, PRIM_GLOW, ALL_SIDES, 0.5]);
+}
+
 default
 {
     state_entry()
     {
-        llParticleSystem([]);
+        init();
         stateBall = 0;
     }
 
@@ -137,6 +145,8 @@ default
         {
             if ((integer)llGetObjectDesc()>0) //* not testing
                 llDie();
+            else
+            	init();
         }
     }
 
