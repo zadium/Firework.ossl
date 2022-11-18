@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.10
-    @updated: "2022-11-15 21:41:03"
-    @revision: 333
+    @updated: "2022-11-18 15:51:02"
+    @revision: 340
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -51,11 +51,11 @@
 */
 //* setting
 integer default_count = 3;
-float default_power = 15;
+float default_power = 10;
 
 //* variables
 integer current_count = 0;
-float current_power = 15;
+float current_power = 0;
 
 
 //* max color is exists in ball code
@@ -64,8 +64,8 @@ integer current_color = 1;
 
 shoot()
 {
-    float randPower = 1;
-    llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, current_power + llFrand(1)>,  llGetRot() * llEuler2Rot(<0.0, PI, 0.0>), current_color);
+    float randPower = 2;
+    llRezObject("FireworkBall", llGetPos() + <0.0,0.0,0.5>, <llFrand(randPower)-randPower/2, llFrand(randPower)-randPower/2, current_power + llFrand(randPower)>,  llGetRot() * llEuler2Rot(<0.0, PI, 0.0>), current_color);
     current_color++;
     if (current_color > max_colors)
         current_color = 1;
@@ -109,7 +109,8 @@ default
 
                 if (llGetSubString(llToLower(message), 0, llStringLength(cmd_firework)-1) == cmd_firework)
                 {
-                    list params = llParseStringKeepNulls(message,[" "],[""]);                    
+                    list params = llParseStringKeepNulls(message,[" "],[""]);
+                    //list params = llGetSubString(message, llStringLength(cmd_firework), -1), STRING_TRIM)
                     integer count = llList2Integer(params, 1);
                     if (count>50)
                         count = 50; //* protecting you ;)

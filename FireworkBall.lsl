@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.10
-    @updated: "2022-11-15 23:47:35"
-    @revision: 357
+    @updated: "2022-11-18 15:30:08"
+    @revision: 392
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -38,9 +38,13 @@ playsoundWhistle()
 
 explode()
 {
-    integer index = ((integer)llGetObjectDesc()) % llGetListLength(StartColors);
-    vector start_color = llList2Vector(StartColors, index);
-    vector end_color = llList2Vector(EndColors, index);
+    integer number = (integer)llGetObjectDesc();
+    if (number > 0) //* not for testing, and we need to stop it in the sky before explode
+        llSetStatus(STATUS_PHYSICS, FALSE);
+
+    integer color_index = number % llGetListLength(StartColors);
+    vector start_color = llList2Vector(StartColors, color_index);
+    vector end_color = llList2Vector(EndColors, color_index);
 
     llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, start_color, 1.0, 20, 0, PRIM_GLOW, ALL_SIDES, 1]);
 
@@ -78,46 +82,49 @@ explode()
     ];
 
     llParticleSystem(params);
+
+    llSetTimerEvent(0.5); //* die after that
 }
 
 integer stateBall = 0;
+vector oldPos; //* for testing only to return back to original pos
 
-firework()
-{
-    if ((integer)llGetObjectDesc()>0)
-        llSetStatus(STATUS_PHYSICS, FALSE);
-    explode();
-    llSetTimerEvent(2);
-}
 
 shoot(float time)
 {
+    stateBall = 0;
     //tail(); //* no, save some for explode
     playsoundWhistle();
-    stateBall = 0;
     if (time==0)
     {
         float speed = llVecMag(llGetVel()); //* meter per seconds
-        llOwnerSay((string)(speed));
-        time = (speed/9.8); //* extra time to fall
+        //llOwnerSay((string)(speed));
+        if (speed == 0)
+            time = 2;
+        else
+            time = (speed/9.8); //* calc the time when reach the top (speed is 0)
     }
 
     llSetTimerEvent(time);
+}
+
+clear()
+{
+    llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, FALSE, <1,1,1>, 0, 0, 0, PRIM_GLOW, ALL_SIDES, 0.5]);
 }
 
 init()
 {
     llSetTimerEvent(0);
     llParticleSystem([]);
-    llSetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT, TRUE, <1,1,1>, 0, 0, 0, PRIM_GLOW, ALL_SIDES, 0.5]);
+    clear();
 }
 
 default
 {
     state_entry()
     {
-    	//llOwnerSay(llGetPos());
-    	//llSetPos(llList2Vector(llGetObjectDetails(llGetOwner(), [OBJECT_POS]), 0));
+        oldPos = llGetPos();
         init();
         stateBall = 0;
     }
@@ -127,8 +134,9 @@ default
         llParticleSystem([]);
         if (number > 0) {
             llSetObjectDesc((string)number);
+            llSetStatus(STATUS_PHYSICS, TRUE);
             llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
-            shoot(2); //* time will use speed
+            shoot(0); //* time will use speed
         }
     }
 
@@ -136,7 +144,10 @@ default
     {
         if (llDetectedKey(0) == llGetOwner())
         {
-            shoot(2);
+            oldPos = llGetPos();
+            llSetStatus(STATUS_PHYSICS, TRUE);
+//            llPushObject(llGetKey(), <0,0,15>, <0,0,0>, FALSE);
+            shoot(0);
         }
     }
 
@@ -144,21 +155,30 @@ default
     {
         if (stateBall == 0)
         {
-            stateBall = 1;
-            llSetTimerEvent(2);
-        }
-        else if (stateBall == 1)
-        {
-            stateBall = 2;
-            firework();
+            stateBall++;
+            explode();
             llSetTimerEvent(1);
         }
         else
         {
+            stateBall = 0;
+            llSetTimerEvent(0);
+
             if ((integer)llGetObjectDesc()>0) //* not testing
+            {
+                clear();
+	            llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
+                llSetAlpha(0, ALL_SIDES);
+                llSleep(0.5);
                 llDie();
-            else
+                //* https://community.secondlife.com/forums/topic/421302-lldie-not-working/
+                llSleep(0.5); //* sleep before end script, idk if that resolve non dead balls in the client
+            }
+            else //* Testing, return back to original pos
+            {
+                llSetRegionPos(oldPos);
                 init();
+            }
         }
     }
 }
