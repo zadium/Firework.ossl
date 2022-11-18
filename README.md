@@ -21,8 +21,19 @@ Copy `Fireworkball` into `Shooter`
 
 Have fun
 
-
 ### Config
+
+In chat you can command it to shoot
+
+Firework count power
+
+Examples:
+
+	Firework
+
+	Firework 5
+
+	Firework 5 10
 
 ### Sounds
 
