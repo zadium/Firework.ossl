@@ -4,8 +4,8 @@
 
     @author:
     @version: 1.10
-    @updated: "2022-11-18 15:30:08"
-    @revision: 392
+    @updated: "2023-02-03 01:59:06"
+    @revision: 395
     @localfile: ?defaultpath\Firework\?@name.lsl
     @license: ?
 
@@ -167,7 +167,7 @@ default
             if ((integer)llGetObjectDesc()>0) //* not testing
             {
                 clear();
-	            llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
+                llSetPrimitiveParams([PRIM_TEMP_ON_REZ, TRUE]);
                 llSetAlpha(0, ALL_SIDES);
                 llSleep(0.5);
                 llDie();
